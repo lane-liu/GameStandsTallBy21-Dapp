@@ -1,0 +1,27 @@
+{
+  "name": "gamestandstallby21",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "lite-server": "^2.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev":"lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiuFan1996/GameStandsTallBy21-Dapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LiuFan1996/GameStandsTallBy21-Dapp/issues"
+  },
+  "homepage": "https://github.com/LiuFan1996/GameStandsTallBy21-Dapp#readme"
+}
