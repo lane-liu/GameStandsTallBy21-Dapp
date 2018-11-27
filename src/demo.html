@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="./bootstrap.css">
+    <style>
+        .card{
+            padding: 8px;
+            margin: 10px auto;
+            width: 500px;
+            height: 100px;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+            line-height: 34px;
+        }
+        .row{
+            margin:5px auto;
+        }
+    </style>
+</head>
+<body>
+<div class="card bg-success">
+    <div class="row">
+        <strong class="col-sm-2">address</strong>
+        <span class="col-sm-10">0xdsadsjfhjsdafjdsfhdsajkf</span>
+    </div>
+    <div class="row">
+        <strong class="col-sm-2">balance</strong>
+        <span class="col-sm-2">22Ether</span>
+        <button class="btn btn-success col-sm-2">抢占</button>
+    </div>
+</div>
+<div class="card bg-info">
+    <div class="row">
+        <strong class="col-sm-2">address</strong>
+        <span class="col-sm-10">0xdsadsjfhjsdafjdsfhdsajkf</span>
+    </div>
+    <div class="row">
+        <strong class="col-sm-2">balance</strong>
+        <span class="col-sm-2">22Ether</span>
+        <button class="btn btn-info col-sm-2">抢占</button>
+    </div>
+</div>
+</body>
+<script>
+    $("button").click(function(){
+        if($(this).text()=="抢占"){
+            $(this).text("匹配");
+        }else{
+            $(this).text("抢占");
+        }
+    });
+</script>
+</html>
