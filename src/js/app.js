@@ -9,10 +9,10 @@ App = {
     },
   
     initWeb3: async function() {
-        if(typeof web3 !=='undefined'){
+        if(typeof web3 !='undefined'){
             App.web3Provider=web3.currentProvider;
         }else{
-            App.web3Provider=new Web3.prviders.HttpProvider("http://127.0.0.1:8545");
+            App.web3Provider=new Web3.prviders.HttpProvider("http://127.0.0.1:7545");
         }
         web3=new Web3(App.web3Provider);
       return App.initContract();
@@ -34,7 +34,7 @@ App = {
       $(document).on('click','.btnmathing',App.mathingOrinherent);
       $(document).on('click','.btnmathingten',App.mathingOrinherentten);
       $(document).on('click','.btnmathinghub',App.mathingOrinherenthub);
-      
+      $(document).on('click','#CallBtn',App.callWinallInfo);
     },
   
     markAdopted: function() {
@@ -46,9 +46,18 @@ App = {
       });
       App.contracts.GameStandsTallBy21.deployed().then(function(instance){
         App.GameStandsTallBy21De=instance;
-        return  instance.oneDicePrice.call()
+        return  instance.oneDicePrice.call();
       }).then(function(value){
         App.oneDicePrice=value;
+        App.GameStandsTallBy21De.round.call().then(function(data){
+          console.log("期数"+data);
+          $("#RoundId").text("Round: "+data);
+        });
+        App.GameStandsTallBy21De.overallBalance.call().then(function(data){
+          console.log("总奖池"+data);
+          var balance=data/10**18;
+          $("#JackPotId").text("JackPot: "+balance+"Ether");
+        });
         for(var j=0;j<3;j++){
           for(var i=1;i<=10;i++){
             var temp;
@@ -181,7 +190,18 @@ App = {
         window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&index="+index+"&ismathing="+"0");
         //window.location.href="localhost:3000/buy.html?address="+App.accounts[0]+"&&weight="+weight+"&&index="+index+"&&ismathing="+"0";
     })
-    }
+    },
+    callWinallInfo:function(event){
+      event.preventDefault();
+     var round=$("#callRoudnInput").val();
+      if(round!=null){
+        App.GameStandsTallBy21De.queryeveryrbywinInfobyround().call(round).then(function(value){
+          if(value!=null){
+            console.log(value);
+          }
+        });
+      }
+    },
   };
   $(function() {
     $(window).load(function() {
