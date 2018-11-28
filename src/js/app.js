@@ -2,7 +2,8 @@ App = {
     web3Provider: null,
     contracts: {},
     accounts:{},
-  
+    inherentflag:true,
+    mathingflag:true,
     init: async function() {
       return await App.initWeb3();
     },
@@ -18,10 +19,10 @@ App = {
     },
   
     initContract: function() {
-      $.getJSON('MyTonkenERC20.json', function(data) {
-        var MyTonkenERC20Artifact=data;
-        App.contracts.MyTonkenERC20=TruffleContract(MyTonkenERC20Artifact);
-        App.contracts.MyTonkenERC20.setProvider(App.web3Provider);
+      $.getJSON('GameStandsTallBy21.json', function(data) {
+        var GameStandsTallBy21Artifact=data;
+        App.contracts.GameStandsTallBy21=TruffleContract(GameStandsTallBy21Artifact);
+        App.contracts.GameStandsTallBy21.setProvider(App.web3Provider);
   
         return App.markAdopted();
       });
@@ -30,123 +31,160 @@ App = {
     },
   
     bindEvents: function() {
-      $(document).on('click', '.selectValueBtn', App.handleSelect);
-      $(document).on('click', '.TansferBtn', App.handleTansfer);
-      $(document).on('click', '.approveBtn', App.handleApprove);
-      $(document).on('click', '.approveselectValueBtn', App.handleapproveselectValueBtn);
-      $(document).on('click', '.transferFromBtn', App.handletransferFromBtn);
+      $(document).on('click','.btnmathing',App.mathingOrinherent);
+      $(document).on('click','.btnmathingten',App.mathingOrinherentten);
+      $(document).on('click','.btnmathinghub',App.mathingOrinherenthub);
       
     },
   
-    markAdopted: function(adopters, account) {
+    markAdopted: function() {
       web3.eth.getAccounts(function(error,accounts){
        App.accounts=accounts;
        var account=accounts[0];
-        $(".address").val(account);
+        $("#palyAccountNamePId").text(account);
         console.log(account);
       });
-     
-     
+      App.contracts.GameStandsTallBy21.deployed().then(function(instance){
+        App.GameStandsTallBy21De=instance;
+        return  instance.oneDicePrice.call()
+      }).then(function(value){
+        App.oneDicePrice=value;
+        for(var j=0;j<3;j++){
+          for(var i=1;i<=10;i++){
+            var temp;
+            if(j==0){
+              temp=1;
+            }else if(j==1){
+              temp=10;
+            }else if(j==2){
+              temp=100;
+            }     
+            App.GameStandsTallBy21De.callsite(temp,i,{from:App.accounts[0]}).then(function(value){
+              console.log(value);
+              if(value[0]!=0){
+                var buttonclassname="";
+                  if(value[2]==1){
+                    buttonclassname=".btnmathing"+value[3];
+                  }else if(value[2]==10){
+                    buttonclassname=".btnmathingten"+value[3];
+                  }else if(value[2]==100){
+                    buttonclassname=".btnmathinghub"+value[3];
+                  }
+                  $(buttonclassname).text("匹配");
+                  console.log($(buttonclassname));
+                  var address=value[0];
+                  address=address.substring(0,15)+"...";
+                  $(buttonclassname).parent().parent().find("span.col-sm-10").text(address);
+                  var balance=value[1]/(10**18);
+                  $(buttonclassname).parent().find("span.col-sm-2").text(balance+"Ether");
+              }
+          });
+          }
+        }
+        });
+    
+    },
+
+    //占位匹配入口
+    mathingOrinherent:function(event) {
+      event.preventDefault();
+      console.log('app.js适配合约1');
+      var classname=$(this).attr("class");
+      if($(this).text()=="抢占"){
+        if(App.inherentflag){
+          $(this).text("匹配");
+          return App.inherent(1,classname);
+        }
+    }else{
+        if(App.mathingflag){
+          $(this).text("抢占");
+          return App.mathing(1,classname);
+        }
+    }
+    },
+    //十倍占位匹配入口
+    mathingOrinherentten:function(event) {
+      event.preventDefault();
+      var classname=$(this).attr("class");
+      console.log('app.js适配合约10');
+      if($(this).text()=="抢占"){
+        if(App.inherentflag){
+          $(this).text("匹配");
+          return App.inherent(10,classname);
+        }
+    }else{
+        if(App.mathingflag){
+          $(this).text("抢占");
+          return App.mathing(10,classname);
+        }
+    }
+    },
+    //百倍入口
+    mathingOrinherenthub:function(event) {
+      event.preventDefault();
+      var classname=$(this).attr("class");
+      console.log('app.js适配合约100');
+      if($(this).text()=="抢占"){
+        if(App.inherentflag){
+          $(this).text("匹配");
+          return App.inherent(100,classname);
+        }
+    }else{
+        if(App.mathingflag){
+          $(this).text("抢占");
+          return App.mathing(100,classname);
+        }
+    }
+    },
+
+    //匹配
+    mathing:function(data,className) {
+        App.mathingflag=false;
+        console.log(typeof className);
+        var weight;
+        var index;
+        if(className.indexOf("btnmathingten") != -1){
+          weight=10;
+        }else if(className.indexOf("btnmathinghub") != -1){
+          weight=100;
+        }else {
+          weight=1;
+        }
+        index=className.substring(className.length-1,className.length);
+        console.log(index,weight);
+      App.GameStandsTallBy21De.matchingPosition(index,weight,{from:App.accounts[0],value:App.oneDicePrice*data}).then(function (value){
+        App.mathingflag=true;
+        window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&&index="+index+"&&ismathing="+"0");
+      })
 
     },
-    //查询余额
-    handleSelect: function(event) {
-      event.preventDefault();
-      console.log("ssssss");
-      App.contracts.MyTonkenERC20.deployed().then(function(instance){
-        MyTonkenERC20Instance=instance;
-        var address= $(".address").val();
-        return MyTonkenERC20Instance.balanceOf.call(address);
-      }).then(function (value){
-       console.log(value);
-       if(value!=null){
-         if(value>10**18){
-          $(".balanceSizeClass").text("余额："+value/10**18+"MT");
-         }else{
-          $(".balanceSizeClass").text("余额："+value+"MTs");
-         }
-       
-       }
-      });
-
-  
-    },
-    //转账
-    handleTansfer: function(event) {
-      event.preventDefault();
-      var toaddress=$(".TansferaddressTo").val();
-      var tovalue=$(".TansferValue").val();
-      App.contracts.MyTonkenERC20.deployed().then(function(instance){
-        MyTonkenERC20Instance=instance;
-        return MyTonkenERC20Instance.transfer(toaddress,tovalue,{from:App.accounts[0]});
-      }).then(function(result){
-          alert("转账成功");
-      }).catch(function(err){
-        console.log(err.message);
-    });
-    },
-    //根据输入授权给授权用户
-    handleApprove: function(event) {
-      event.preventDefault();
-      var toaddress=$(".approveAddress").val();
-      var tovalue=$(".approveValue").val();
-      App.contracts.MyTonkenERC20.deployed().then(function(instance){
-        MyTonkenERC20Instance=instance;
-        return MyTonkenERC20Instance.approve(toaddress,tovalue,{from:App.accounts[0]});
-      }).then(function(result){
-        if(result){
-          alert("转账成功");
-        }else{
-          alert("转账失败");
-        }  
-      }).catch(function(err){
-        console.log(err.message);
-    });
-    },
-    //查询授权额度
-    handleapproveselectValueBtn: function(event) {
-      event.preventDefault();
-      App.contracts.MyTonkenERC20.deployed().then(function(instance){
-        MyTonkenERC20Instance=instance;
-        var address= $(".approveaddress").val();
-        return MyTonkenERC20Instance.allowance.call(App.accounts[0],address);
-      }).then(function (value){
-       console.log(value);
-       if(value!=null){
-         if(value>10**18){
-          $(".approvebalanceSizeClass").text("余额："+value/10**18+"MT");
-         }else{
-          $(".approvebalanceSizeClass").text("余额："+value+"MTs");
-         }
-       
-       }
-      });
-    },
-    handletransferFromBtn: function(event) {
-      event.preventDefault();
-      var aoaddress=$(".transferFromFAddress").val();
-      var toaddress=$(".transferFromToAddress").val();
-      var tovalue=$(".transferFromValue").val();
-      console.log("from:"+App.accounts[0]+"to:"+toaddress+"msg.sender:"+aoaddress);
-      App.contracts.MyTonkenERC20.deployed().then(function(instance){
-        MyTonkenERC20Instance=instance;
-        return MyTonkenERC20Instance.transferFrom(App.accounts[0],toaddress,tovalue,{from:aoaddress});
-      }).then(function(result){
-        if(result){
-          alert("转账成功");
-        }else{
-          alert("转账失败");
-        }  
-      }).catch(function(err){
-        console.log(err.message);
-    });
+    
+    //抢占
+    inherent:function(data,className) {
+      App.inherentflag=false;
+      console.log(typeof className);
+      var weight;
+      var index;
+      if(className.indexOf("btnmathingten") != -1){
+        weight=10;
+      }else if(className.search("btnmathinghub") != -1){
+        weight=100;
+      }else {
+        weight=1;
+      }
+      index=className.substring(className.length-1,className.length);
+      console.log(index,weight);
+      App.GameStandsTallBy21De.takePosition(index,weight,{from:App.accounts[0],value:App.oneDicePrice*data}).then(function (value){
+        console.log(value)
+        App.inherentflag=true;
+        console.log(weight+" "+index+"  "+App.accounts[0]);
+        window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&&index="+index+"&&ismathing="+"0");
+        //window.location.href="localhost:3000/buy.html?address="+App.accounts[0]+"&&weight="+weight+"&&index="+index+"&&ismathing="+"0";
+    })
     }
   };
-  
   $(function() {
     $(window).load(function() {
-      
       App.init();
     });
   });
-  

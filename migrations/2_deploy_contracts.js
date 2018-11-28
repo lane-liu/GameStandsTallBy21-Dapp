@@ -1,4 +1,4 @@
-var Game = artifacts.require("./Game.sol");
+var Game = artifacts.require("./GameStandsTallBy21.sol");
 
 module.exports = function(deployer) {
   deployer.deploy(Game);

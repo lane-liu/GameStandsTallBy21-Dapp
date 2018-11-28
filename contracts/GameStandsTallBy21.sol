@@ -88,7 +88,7 @@ contract GameStandsTallBy21{
     //期数
     uint256 public round ;
     //色子单价
-    uint256 oneDicePrice;
+    uint256 public oneDicePrice;
     //总奖池
     uint256 public overallBalance;
     //总奖池上限 
@@ -265,7 +265,7 @@ contract GameStandsTallBy21{
     
     //两两匹配开奖
     function matchingdraw(address _inherent,address _match,uint8 _weight,uint8 index) private                                                                                                                                                                                                                                                                                                                                                                                       {
-        require(_inherent!=_match&&_weight!=address(0));
+        require(_inherent!=_match);
         require(inherent10addrstate[_weight][index]==_inherent);
         playerStr memory _inherentplayer=inherent10Info[_weight][index];
         playerStr memory _matchplayer=trbyplayerStrs[_match];
@@ -345,7 +345,7 @@ contract GameStandsTallBy21{
     //清除位置数据 
     function clearPosition(uint8 seatNumber,uint8 roomNum)private{
         //找到房间的对应位置的address设为0
-                                  require(inherent10addrstate[roomNum][seatNumber]!=address(0));
+       require(inherent10addrstate[roomNum][seatNumber]!=address(0));
        inherent10addrstate[roomNum][seatNumber]=address(0);
        inherent10matchingstate[roomNum][seatNumber]=false;
        inherent10matchingaddr[roomNum][seatNumber]=address(0);
@@ -365,7 +365,7 @@ contract GameStandsTallBy21{
     // mapping(uint8=>mapping(uint8=>address)) private inherent10matchingaddr; 
         //占位置
     //seatNumber//位子序号, roomNum//房间序号代表权重, periodsNum//期数
-    function takePosition(uint8 seatNumber,uint8 roomNum)public payable{
+    function takePosition(uint8 seatNumber,uint8 roomNum)public payable returns(uint8 random,uint8 weight_ ,uint8 index_){
       require(roomNum==1||roomNum==10||roomNum==100);
       require(seatNumber>0&&seatNumber<=10);
       require(trbyplayerStrs[msg.sender].isinherent==false);
@@ -375,23 +375,23 @@ contract GameStandsTallBy21{
       require(inherent10addrstate[roomNum][seatNumber]==address(0)&&
       inherent10matchingaddr[roomNum][seatNumber]==address(0)&&
       inherent10matchingstate[roomNum][seatNumber]==false);
-     
        //将房间号对应位子序号对应地址（既是用户mapping映射完全）
       inherent10addrstate[roomNum][seatNumber]=msg.sender;
       inherent10matchingstate[roomNum][seatNumber]=true;
       //添加到当前所有用户
       trbyplayeradrr.push(msg.sender);
-     
       Placeholder(msg.sender,roomNum,seatNumber);
-
+       index_=seatNumber;
+       weight_=roomNum;
+       random=trbyplayerStrs[msg.sender].random;
     }
 
     //匹配，外来者相匹配位子上面的人
-    function   matchingPosition(uint8 seatNumber,uint8 roomNum)public payable{
+    function matchingPosition(uint8 seatNumber,uint8 roomNum)public payable returns(uint8 random,uint8 weight_ ,uint8 index_){
        require(roomNum==1||roomNum==10||roomNum==100);
        require(seatNumber>0&&seatNumber<=10);
-       require(trbyplayerStrs[msg.sender].isinherent==false);
-       trbyplayerStrs[msg.sender].isinherent=true;
+       require(trbyplayerStrs[msg.sender].ismatching==false);
+       trbyplayerStrs[msg.sender].ismatching=true;
         require(oneDicePrice *roomNum==msg.value);
         //找到房间的对应位置的上面的人是否被匹配了
        require(inherent10matchingstate[roomNum][seatNumber]!=false);
@@ -404,7 +404,9 @@ contract GameStandsTallBy21{
         trbyplayeradrr.push(msg.sender);
         //挑战者购买骰子
         Placeholder(msg.sender,roomNum,seatNumber);
-        
+        index_=seatNumber;
+        weight_=roomNum;
+        random=trbyplayerStrs[msg.sender].random;
     }
     //占位者提交
     function inherentsubmit(uint8 seatNumber,uint8 roomNum) public returns(bool){
@@ -419,6 +421,7 @@ contract GameStandsTallBy21{
         playerStr storage player=trbyplayerStrs[msg.sender];
         player.issubmit=true;
         address _inherent=inherent10addrstate[roomNum][seatNumber];
+        require(_inherent!=address(0));
         matchingdraw(_inherent,msg.sender,roomNum,seatNumber);
     }
 
@@ -490,6 +493,15 @@ contract GameStandsTallBy21{
         keys_=everyrbypalyerstrInfo[_round][msg.sender].thisrbykeys;
         priceSizes_=everyrbypalyerstrInfo[_round][msg.sender].PriceSizes;
     }
+    
+//call site 的状态
+    function callsite(uint8 weight,uint8 index) public view returns(address playaddr,uint256 balance,uint8 weight_,uint8 index_){
+        playaddr=inherent10addrstate[weight][index];
+        balance=inherent10Info[weight][index].PriceSize;
+        weight_=weight;
+        index_=index;
+    }
+    
 
     
      //销毁合约
