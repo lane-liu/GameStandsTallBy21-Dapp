@@ -134,6 +134,8 @@ contract GameStandsTallBy21{
             uint randNonce; 
             //随机数
             uint8 random; 
+            //所有色子的点数
+            uint8[] randoms;
             //所有点数
             uint8 [] thisrbykeys;
             //所有奖池大小大小
@@ -220,6 +222,8 @@ contract GameStandsTallBy21{
 
     //购买色子 计算这次色子产生的随机值，并将这个值返回给用户，同时需要在用户信息中存储当前奖池注的变化，如果炸掉自动开奖
     function BuyDice(uint8 weight,uint8 index) public payable {
+        require(trbyplayerStrs[msg.sender].isinherent==true||trbyplayerStrs[msg.sender].ismatching==true);
+        require(inherent10addrstate[weight][index]==msg.sender||inherent10matchingaddr[weight][index]==msg.sender);
         playerStr storage player = trbyplayerStrs[msg.sender];
         //判断骰子是否被锁
         require(msg.value==player.dicesize*weight);
@@ -234,6 +238,7 @@ contract GameStandsTallBy21{
             //重构用户信息
             player.weight = weight;
             uint256 temp=player.dicesize;
+            player.randoms.push(player.random);
             player.thisrbykey = player.thisrbykey + player.random;
             player.PriceSize = player.PriceSize + oneDicePrice;
             player.dicemul = uint8(player.dicemul.add(1));
@@ -256,6 +261,7 @@ contract GameStandsTallBy21{
         player.thisrbykey = player.random;
         player.PriceSize = oneDicePrice;
         player.dicemul = 1;
+        player.randoms.push(player.random);
         player.dicesize =oneDicePrice.add(oneDicePrice.div(2));
         if(inherent10addrstate[weight][index]==msg.sender){
             inherent10Info[weight][index] = player;
@@ -333,6 +339,8 @@ contract GameStandsTallBy21{
         player.randNonce=0;
         player.random=0;
         player.issubmit=false;
+        uint8[] memory s1;
+        player.randoms=s1;
         everyrbypalyerstrInfo[round][_addr]=player;
         playerStr memory p1;
         trbyplayerStrs[_addr]=p1;
@@ -494,15 +502,24 @@ contract GameStandsTallBy21{
         priceSizes_=everyrbypalyerstrInfo[_round][msg.sender].PriceSizes;
     }
     
-//call site 的状态
+    //call site 的状态
     function callsite(uint8 weight,uint8 index) public view returns(address playaddr,uint256 balance,uint8 weight_,uint8 index_){
         playaddr=inherent10addrstate[weight][index];
         balance=inherent10Info[weight][index].PriceSize;
         weight_=weight;
         index_=index;
     }
-    
-
+    // 当前匹配或占领用户查询自己信息
+    function callinherent(uint8 _weight,uint8 _index)public view returns(uint8[] randoms_){
+        require(trbyplayerStrs[msg.sender].isinherent==true);
+        require(inherent10addrstate[_weight][_index]==msg.sender);
+        randoms_=trbyplayerStrs[msg.sender].randoms;
+    }
+     function callmathing(uint8 _weight,uint8 _index)public view returns(uint8[] randoms_){
+        require(trbyplayerStrs[msg.sender].ismatching==true);
+        require(inherent10matchingaddr[_weight][_index]==msg.sender);
+        randoms_=trbyplayerStrs[msg.sender].randoms;
+    }
     
      //销毁合约
     function kill() OnlyOwner() external{

@@ -152,9 +152,9 @@ App = {
         }
         index=className.substring(className.length-1,className.length);
         console.log(index,weight);
-      App.GameStandsTallBy21De.matchingPosition(index,weight,{from:App.accounts[0],value:App.oneDicePrice*data}).then(function (value){
+      App.GameStandsTallBy21De.matchingPosition(index,weight,{from:App.accounts[0],value:App.oneDicePrice*data,gasPrice:2*10**9}).then(function (value){
         App.mathingflag=true;
-        window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&&index="+index+"&&ismathing="+"0");
+        window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&index="+index+"&ismathing="+"1");
       })
 
     },
@@ -174,11 +174,11 @@ App = {
       }
       index=className.substring(className.length-1,className.length);
       console.log(index,weight);
-      App.GameStandsTallBy21De.takePosition(index,weight,{from:App.accounts[0],value:App.oneDicePrice*data}).then(function (value){
+      App.GameStandsTallBy21De.takePosition(index,weight,{from:App.accounts[0],value:App.oneDicePrice*data,gasPrice:2*10**9}).then(function (value){
         console.log(value)
         App.inherentflag=true;
         console.log(weight+" "+index+"  "+App.accounts[0]);
-        window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&&index="+index+"&&ismathing="+"0");
+        window.location.replace("http://192.168.46.1:3000/buy.html?"+"weight="+weight+"&index="+index+"&ismathing="+"0");
         //window.location.href="localhost:3000/buy.html?address="+App.accounts[0]+"&&weight="+weight+"&&index="+index+"&&ismathing="+"0";
     })
     }
