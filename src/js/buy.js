@@ -23,7 +23,6 @@ App = {
                 if(strParame==argname){
                     return args[strParame];
                 }
-            
         }
     },
     initWeb3: async function() {
