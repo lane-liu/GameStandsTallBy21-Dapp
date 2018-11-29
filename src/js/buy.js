@@ -71,6 +71,7 @@ App = {
                     var src="<img src='../img/"+v+".gif'>"
                     $(".BuyImgRoom").append(src);
                 });
+                $(".roundnumclass").text("当前点数:"+value[0]);
             });
         }else{
             App.GameStandsTallBy21De.callinherent(App.weight,App.index,{from:App.accounts[0]}).then(function(value){
@@ -79,6 +80,7 @@ App = {
                     var src="<img src='../img/"+v+".gif'>"
                     $(".BuyImgRoom").append(src);
                 });
+                $(".roundnumclass").text("当前点数:"+value[0]);
             });
         }
         App.oneDicePrice=value;
@@ -111,6 +113,11 @@ App = {
                 });
             }
         });
+        var rondomsum;
+        for (var k=0;k<App.rondoms.length;k++){
+            rondomsum+=App.rondoms[k];
+        }
+        $(".roundnumclass").text("当前点数:"+rondomsum);
     },
     buysubmitInfo:function(){
         if(App.ismathing==1){

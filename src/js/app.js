@@ -8,7 +8,7 @@ App = {
     init: async function() {
       return await App.initWeb3();
     },
-  
+
     initWeb3: async function() {
         if(typeof web3 !='undefined'){
             App.web3Provider=web3.currentProvider;
@@ -18,26 +18,27 @@ App = {
         web3=new Web3(App.web3Provider);
       return App.initContract();
     },
-  
+
     initContract: function() {
       $.getJSON('GameStandsTallBy21.json', function(data) {
         var GameStandsTallBy21Artifact=data;
         App.contracts.GameStandsTallBy21=TruffleContract(GameStandsTallBy21Artifact);
         App.contracts.GameStandsTallBy21.setProvider(App.web3Provider);
-  
         return App.markAdopted();
       });
-  
       return App.bindEvents();
     },
-  
+
     bindEvents: function() {
       $(document).on('click','.btnmathing',App.mathingOrinherent);
       $(document).on('click','.btnmathingten',App.mathingOrinherentten);
       $(document).on('click','.btnmathinghub',App.mathingOrinherenthub);
-      $(document).on('click','#CallBtn',App.callWinallInfo);
+      $(document).on('click', '#CallBtn',App.callWinallInfo);
+      $(document).on('change','#RodundInputId',App.classBalance);
+      $(document).on('change','#PayInBtn',App.PayInBalance);
+      
     },
-  
+
     markAdopted: function() {
       web3.eth.getAccounts(function(error,accounts){
        App.accounts=accounts;
@@ -69,7 +70,7 @@ App = {
               temp=10;
             }else if(j==2){
               temp=100;
-            }     
+            }
             App.GameStandsTallBy21De.callsite(temp,i,{from:App.accounts[0]}).then(function(value){
               console.log(value);
               if(value[0]!=0){
@@ -195,7 +196,7 @@ App = {
     //根据期数查询总奖池开奖信息
     callWinallInfo:function(event){
       event.preventDefault();
-     var round=$("#callRoudnInput").val();
+      var round=$("#callRoudnInput").val();
       if(round!=null){
         App.GameStandsTallBy21De.queryeveryrbywinInfobyround().call(round).then(function(value){
           if(value!=null){
@@ -204,7 +205,27 @@ App = {
         });
       }
     },
+    classBalance:function(){
+      var round=$("#RodundInputId").val();
+      console.log(round);
+      if(round!=null){
+        App.GameStandsTallBy21De.iswinbyallbalance(round,{from:App.accounts[0]}).then(function(value){
+         var monery=value[2]/10**18;
+         $("#roundBalanceId").text(monery+"ether"); 
+        });
+      }
+    },
+    //根据期数提钱
+    PayInBalance:function(){
+      var balance=$("#roundBalanceId").text();
+      var balanceof=$("#balanceofId").text();
+      var round=$("#RodundInputId").val();
+      if(balance>=balanceof){
+        return App.GameStandsTallBy21De.drawmoneybyround(round,balanceof,{from:App.accounts[0]});
+      }
+    }
   };
+  
   $(function() {
     $(window).load(function() {
       App.init();
