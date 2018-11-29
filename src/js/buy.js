@@ -29,7 +29,7 @@ App = {
         if(typeof web3 !=='undefined'){
             App.web3Provider=web3.currentProvider;
         }else{
-            App.web3Provider=new Web3.prviders.HttpProvider("http://127.0.0.1:7545");
+            App.web3Provider=new Web3.prviders.HttpProvider("http://127.0.0.1:8545");
         }
         web3=new Web3(App.web3Provider);
       return App.initContract();
@@ -79,7 +79,13 @@ App = {
                     var src="<img src='../img/"+v+".gif'>"
                     $(".BuyImgRoom").append(src);
                 });
-                $(".roundnumclass").text("当前点数:"+value[0]);
+                console.log(App.rondoms);
+        var rondomsum=0;
+        for (var k=0;k<App.rondoms.length;k++){
+            rondomsum+=parseInt(App.rondoms[k]);
+        }
+        rondomsum=parseInt(rondomsum+"",10);
+        $(".roundnumclass").text("当前点数:"+rondomsum);
             });
         }
         App.oneDicePrice=value;
@@ -114,8 +120,9 @@ App = {
         });
         var rondomsum;
         for (var k=0;k<App.rondoms.length;k++){
-            rondomsum+=App.rondoms[k];
+            rondomsum+=parseInt(App.rondoms[k]);
         }
+        rondomsum=parseInt(rondomsum+"",10);
         $(".roundnumclass").text("当前点数:"+rondomsum);
     },
     buysubmitInfo:function(){
