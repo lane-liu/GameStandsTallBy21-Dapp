@@ -4,6 +4,7 @@ App = {
     accounts:{},
     inherentflag:true,
     mathingflag:true,
+    round:null,
     init: async function() {
       return await App.initWeb3();
     },
@@ -51,6 +52,7 @@ App = {
         App.oneDicePrice=value;
         App.GameStandsTallBy21De.round.call().then(function(data){
           console.log("期数"+data);
+          App.round=data;
           $("#RoundId").text("Round: "+data);
         });
         App.GameStandsTallBy21De.overallBalance.call().then(function(data){
@@ -167,7 +169,6 @@ App = {
       })
 
     },
-    
     //抢占
     inherent:function(data,className) {
       App.inherentflag=false;
@@ -191,6 +192,7 @@ App = {
         //window.location.href="localhost:3000/buy.html?address="+App.accounts[0]+"&&weight="+weight+"&&index="+index+"&&ismathing="+"0";
     })
     },
+    //根据期数查询总奖池开奖信息
     callWinallInfo:function(event){
       event.preventDefault();
      var round=$("#callRoudnInput").val();
