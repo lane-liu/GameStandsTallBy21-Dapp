@@ -311,7 +311,7 @@ contract GameStandsTallBy21{
             uint256 winprice=allprice.mul(80).div(100);
             uint256 winownerpricae=allprice.mul(5).div(100);
             winaddr.transfer(winprice);
-            overallBalance+=allprice.mul(15).div(100);
+            overallBalance+=(allprice.mul(15).div(100));
             owner.transfer(winownerpricae);
     }
    
@@ -418,15 +418,15 @@ contract GameStandsTallBy21{
     }
     //占位者提交
     function inherentsubmit(uint8 seatNumber,uint8 roomNum) public returns(bool){
-        require( player.issubmit!=true);
        playerStr storage player=inherent10Info [roomNum][seatNumber];
+       require( player.issubmit!=true);
        return player.issubmit=true;
     }
     
     //匹配者提交
-    function matchingsubmit(uint8 seatNumber,uint8 roomNum) public{
-        require( player.issubmit!=true);
+    function matchingsubmit(uint8 seatNumber,uint8 roomNum) payable public{
         playerStr storage player=trbyplayerStrs[msg.sender];
+         require( player.issubmit!=true);
         player.issubmit=true;
         address _inherent=inherent10addrstate[roomNum][seatNumber];
         require(_inherent!=address(0));

@@ -79,7 +79,7 @@ App = {
                     var src="<img src='../img/"+v+".gif'>"
                     $(".BuyImgRoom").append(src);
                 });
-                console.log(App.rondoms);
+         console.log(App.rondoms);
         var rondomsum=0;
         for (var k=0;k<App.rondoms.length;k++){
             rondomsum+=parseInt(App.rondoms[k]);
